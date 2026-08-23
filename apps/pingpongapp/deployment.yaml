@@ -1,50 +1,95 @@
+# ==============================================================================
+# Kubernetes Deployment Manifest for Spring Boot Application (pingpongapp)
+# Documentation: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+# ==============================================================================
+
+# 'apiVersion': Specifies the Kubernetes API version for Deployments
 apiVersion: apps/v1
+
+# 'kind': Declares that this resource is a Deployment controller
+# Deployments manage replica sets, rolling updates, and self-healing of pods.
 kind: Deployment
+
+# 'metadata': Unique identification and labeling for this resource
 metadata:
   name: pingpongapp
   labels:
     app: pingpongapp
+
+# 'spec': Desired state configuration for the Deployment
 spec:
+  # Number of identical Pod replicas to run concurrently
   replicas: 1
+
+  # 'selector': Defines how the Deployment controller finds which Pods to manage
+  # Must match the labels in 'spec.template.metadata.labels'
   selector:
     matchLabels:
       app: pingpongapp
+
+  # 'template': Blueprint describing the Pods created by this Deployment
   template:
     metadata:
+      # Labels assigned to each created Pod instance
       labels:
         app: pingpongapp
+
     spec:
+      # List of containers running inside each Pod
       containers:
         - name: pingpongapp
+          # The container image location (Registry / Repository / Tag)
+          # Updated automatically during GitOps CD releases
           image: jayesh1604/pingpongapp:latest
+
+          # 'imagePullPolicy': When Kubernetes should pull the image from registry
+          # IfNotPresent: Pulls image only if it doesn't already exist locally on the node
+          # Documentation: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
           imagePullPolicy: IfNotPresent
+
+          # 'ports': Network ports exposed by the container
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
+
+          # 'env': Environment variables injected into the container at runtime
+          # Can override Spring Boot properties (e.g. SERVER_PORT=8080)
           env:
             - name: SERVER_PORT
               value: "8080"
+
+          # 'resources': Compute resource constraints (CPU & Memory)
+          # Documentation: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
           resources:
+            # 'requests': Guaranteed minimum resources Kubernetes reserves on the worker node
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 100m          # 100 millicores (0.1 CPU core)
+              memory: 256Mi      # 256 Megabytes of RAM
+            # 'limits': Maximum ceiling of resources the container is allowed to consume
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 500m          # 500 millicores (0.5 CPU core)
+              memory: 512Mi      # 512 Megabytes of RAM (prevents Out-Of-Memory leaks)
+
+          # 'livenessProbe': Checks if the application is alive / healthy
+          # If this probe fails, Kubernetes restarts the unhealthy container automatically
+          # Documentation: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
           livenessProbe:
             httpGet:
-              path: /ping
+              path: /ping        # HTTP endpoint provided by RestTestController
               port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
+            initialDelaySeconds: 30  # Wait 30s after startup before first check (allows JVM to initialize)
+            periodSeconds: 10        # How often (in seconds) to perform the probe
+            timeoutSeconds: 3        # Number of seconds after which probe times out
+            failureThreshold: 3      # Consecutive failures before restarting the container
+
+          # 'readinessProbe': Checks if the application is ready to accept incoming user traffic
+          # If this probe fails, Kubernetes removes the pod IP from Service endpoints until ready
           readinessProbe:
             httpGet:
-              path: /ping
+              path: /ping        # Endpoint to verify readiness
               port: 8080
-            initialDelaySeconds: 15
-            periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 2
+            initialDelaySeconds: 15  # Wait 15s after startup before testing readiness
+            periodSeconds: 5         # Check readiness every 5 seconds
+            timeoutSeconds: 3        # Timeout after 3 seconds
+            failureThreshold: 2      # Consecutive failures before marking pod unready

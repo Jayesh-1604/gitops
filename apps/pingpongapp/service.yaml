@@ -1,15 +1,36 @@
+# ==============================================================================
+# Kubernetes Service Manifest for Spring Boot Application (pingpongapp)
+# Documentation: https://kubernetes.io/docs/concepts/services-networking/service/
+# ==============================================================================
+
+# 'apiVersion': Core API version for standard Kubernetes resources like Services
 apiVersion: v1
+
+# 'kind': Service acts as an internal load balancer and stable network endpoint (DNS)
+# for dynamically scaling / ephemeral Pods.
 kind: Service
+
+# 'metadata': Resource name and labels
 metadata:
   name: pingpongapp-service
   labels:
     app: pingpongapp
+
+# 'spec': Network configuration for the Service
 spec:
+  # 'type': ClusterIP exposes the Service on an internal IP in the cluster.
+  # This makes the Service reachable only from within the Kubernetes cluster.
+  # (Use 'NodePort' or 'LoadBalancer' if external public ingress is needed directly)
+  # Documentation: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
+
+  # 'selector': Directs incoming network traffic to any Pod that has the label 'app: pingpongapp'
   selector:
     app: pingpongapp
+
+  # 'ports': Port mapping between the Service and target Pods
   ports:
     - name: http
-      port: 8080
-      targetPort: 8080
-      protocol: TCP
+      port: 8080        # Port exposed internally by this Service (pingpongapp-service:8080)
+      targetPort: 8080  # Port where the Spring Boot application container listens
+      protocol: TCP     # Transport protocol

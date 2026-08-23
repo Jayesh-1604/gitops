@@ -1,15 +1,31 @@
+# ==============================================================================
+# Kustomize Configuration for Application (pingpongapp)
+# Documentation: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/
+# ==============================================================================
+
+# 'apiVersion': Kustomize schema API version
 apiVersion: kustomize.config.k8s.io/v1beta1
+
+# 'kind': Kustomization defines how Kubernetes manifests are combined and transformed
 kind: Kustomization
 
+# 'resources': List of raw Kubernetes manifest files to include in this deployment bundle
+# Documentation: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/resources/
 resources:
   - deployment.yaml
   - service.yaml
 
+# 'commonLabels': Automatically injects these labels into all resources (Deployments, Services, Pods)
+# Documentation: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/commonlabels/
 commonLabels:
   app.kubernetes.io/name: pingpongapp
   app.kubernetes.io/part-of: GitActionDemo
   app.kubernetes.io/managed-by: kustomize
 
+# 'images': Allows updating container image names, registries, or tags declaratively.
+# CI workflows update the image tag dynamically using:
+#   kustomize edit set image jayesh1604/pingpongapp=jayesh1604/pingpongapp:<NEW_TAG>
+# Documentation: https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/images/
 images:
   - name: jayesh1604/pingpongapp
     newName: jayesh1604/pingpongapp

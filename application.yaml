@@ -1,22 +1,56 @@
+# ==============================================================================
+# ArgoCD Application Manifest (GitOps Continuous Delivery)
+# Documentation: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications
+# ==============================================================================
+
+# 'apiVersion': ArgoCD Custom Resource Definition (CRD) API group
 apiVersion: argoproj.io/v1alpha1
+
+# 'kind': ArgoCD Application resource that continuously syncs a Git repo with a Kubernetes cluster
 kind: Application
+
+# 'metadata': Application name and the namespace where ArgoCD is installed (argocd)
 metadata:
   name: pingpongapp
   namespace: argocd
+  # 'finalizers': Ensures that if this Application CRD is deleted in ArgoCD,
+  # all underlying Kubernetes resources (Deployments, Services, etc.) are safely deleted as well (cascading delete).
+  # Documentation: https://argo-cd.readthedocs.io/en/stable/user-guide/app_deletion/#cascading-deletion
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+
+# 'spec': Desired state and synchronization configuration
 spec:
+  # 'project': Logical grouping for access control and RBAC (default project)
   project: default
+
+  # 'source': Defines where the application manifests are stored in Git
   source:
+    # URL to the GitOps Git repository
     repoURL: https://github.com/Jayesh-1604/gitops.git
+    # Target branch or commit/tag to track
     targetRevision: main
+    # Subdirectory path inside the repository containing the Kubernetes / Kustomize manifests
     path: apps/pingpongapp
+
+  # 'destination': Defines the target Kubernetes cluster and namespace where resources will be deployed
   destination:
+    # 'server': In-cluster Kubernetes API server endpoint
     server: https://kubernetes.default.svc
+    # 'namespace': Target Kubernetes namespace to deploy the application into
     namespace: default
+
+  # 'syncPolicy': Automated synchronization behaviors
+  # Documentation: https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/
   syncPolicy:
+    # Automatically triggers sync when Git repository changes are detected
     automated:
+      # 'prune': Automatically deletes Kubernetes resources that are removed from the Git repository
       prune: true
+      # 'selfHeal': Automatically reverts any manual changes made directly to cluster via kubectl
+      # to guarantee that Git remains the single source of truth
       selfHeal: true
+    # Extra synchronization options
     syncOptions:
+      # Automatically creates the destination namespace if it doesn't already exist
       - CreateNamespace=true
