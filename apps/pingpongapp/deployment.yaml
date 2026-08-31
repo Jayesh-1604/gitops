@@ -35,6 +35,8 @@ spec:
         app: pingpongapp
 
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
       # List of containers running inside each Pod
       containers:
         - name: pingpongapp
