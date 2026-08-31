@@ -29,7 +29,7 @@ commonLabels:
 images:
 - name: jayeeshh/pingpongapp
   newName: jayeeshh/pingpongapp
-  newTag: c872829a92ce0315c00c2d7325156457cc9b857f
+  newTag: dfd07b14a1c82f5f0a527ab998a1a8638234a5b4
 - name: jayesh1604/pingpongapp
   newName: jayesh1604/pingpongapp
   newTag: latest
