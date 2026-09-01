@@ -42,7 +42,7 @@ spec:
         - name: pingpongapp
           # The container image location (Registry / Repository / Tag)
           # Updated automatically during GitOps CD releases
-          image: jayesh1604/pingpongapp:latest
+          image: jayeeshh/pingpongapp:latest
 
           # 'imagePullPolicy': When Kubernetes should pull the image from registry
           # IfNotPresent: Pulls image only if it doesn't already exist locally on the node

@@ -30,6 +30,6 @@ images:
 - name: jayeeshh/pingpongapp
   newName: jayeeshh/pingpongapp
   newTag: dfd07b14a1c82f5f0a527ab998a1a8638234a5b4
-- name: jayesh1604/pingpongapp
-  newName: jayesh1604/pingpongapp
+- name: jayeeshh/pingpongapp
+  newName: jayeeshh/pingpongapp
   newTag: latest
